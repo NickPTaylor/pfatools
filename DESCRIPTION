@@ -1,0 +1,15 @@
+Package: pfatools
+Type: Package
+Title: Plant Feedback Analysis Tools
+Version: 0.0.0.9000
+Authors@R: person("Nick", "Taylor", email = "nicholas.taylor@doosan.com", 
+    role = c("cre", "aut"))
+Description: Collection of tools and shiny apps for cleaning of plant feedback
+    data.
+License: file LICENCE
+Encoding: UTF-8
+LazyData: true
+Suggests:
+    testthat,
+    covr
+RoxygenNote: 5.0.1
