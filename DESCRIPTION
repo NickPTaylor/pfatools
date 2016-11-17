@@ -12,7 +12,12 @@ LazyData: true
 Suggests:
     testthat,
     covr,
-    tibble
+    tibble,
+    rmarkdown, 
+    flexdashboard,
+    shiny,
+    DT,
+    readxl
 Imports:
     magrittr, 
     lubridate,

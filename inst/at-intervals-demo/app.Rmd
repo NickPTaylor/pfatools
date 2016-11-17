@@ -1,0 +1,96 @@
+---
+title: "Regularise Time Intervals"
+output: 
+  flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+Column {.sidebar data-width=300}
+-----------------------------------------------------------------------
+
+The purpose of this application is to derive a regular sequenced, synchronised time series from one which is irregular and asynchronous.
+
+```{r}
+devtools::install_github('NickPTaylor/pfatools')
+
+# read in raw data ------------------------------------------------------------
+raw_data <- shiny::reactive({
+    
+    # there is a bug in shiny which requires a workaround here
+    # see https://github.com/hadley/readxl/issues/85
+    inFile <- input$input_file
+    if (is.null(inFile))
+        return(NULL)
+    file.rename(inFile$datapath,
+                paste(inFile$datapath, ".xlsx", sep = ""))
+    x <- readxl::read_excel(paste(inFile$datapath, ".xlsx", sep = ""), 
+                            skip = 1)
+    x[[1]] <- as.POSIXct(x[[1]] * 60 * 60 * 24, 
+                         origin = "1899-12-30", tz = "UTC")
+    x 
+})
+# output data -----------------------------------------------------------------
+reg_data <- shiny::reactive({
+    req(raw_data())
+    x <- pfatools::at_intervals(raw_data(), 
+                           by = paste(input$time_int, input$time_unit))
+    x[[1]] <- format(x[[1]], "%F %H:%M:%S") 
+    x
+})
+
+# user interface for side bar -------------------------------------------------
+shiny::fileInput("input_file", "Select input Excel file:")
+
+shiny::fluidRow(
+        shiny::column(6,
+            shiny::numericInput("time_int", "Time Interval:", 
+                                value = 60, min = 0)),
+        shiny::column(6,
+            shiny::selectInput("time_unit", "Unit:",
+                               choices = c("secs", "mins", "hours", "days")))
+)
+
+shiny::downloadButton("download", "Download")
+shiny::downloadHandler(
+    filename = function() { 
+        paste("out", Sys.Date(), ".xlsx") 
+    },
+    content = function(file) {
+        readr::write_excel_csv(reg_data(), file)
+    })
+```
+
+Column
+-----------------------------------------------------------------------
+### Original Data
+
+```{r}
+# render tables of raw and processed data ------------------------------------
+DT::renderDataTable({
+    DT::datatable(head(raw_data(), 50), 
+        options = list(scrollY = "200px", 
+                       paging = FALSE, 
+                       autoWidth = TRUE,
+                       scrollX = TRUE, 
+                       scrollCollapse = TRUE,
+                       columnDefs = list(list(width = '150px', 
+                                              targets = list(1)))
+  ))
+})
+```
+
+### Regularised Data
+
+```{r}
+DT::renderDataTable({
+    DT::datatable(head(reg_data(), 50), 
+        options = list(scrollY = "200px", 
+                       paging = FALSE, 
+                       autoWidth = TRUE,
+                       scrollX = TRUE,
+                       scrollCollapse = FALSE,  
+                       columnDefs = list(list(width = '150px', 
+                                              targets = (1)))
+        ))
+})
+```

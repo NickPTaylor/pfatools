@@ -11,7 +11,7 @@ at_intervals(x, ..., na.rm = TRUE)
 
 \item{...}{Arguments passed to \code{seq} method}
 
-\item{na.rm}{A logical scalar.  Defults to TRUE.}
+\item{na.rm}{A logical scalar.  Defaults to TRUE.}
 }
 \value{
 A data frame
@@ -19,12 +19,12 @@ A data frame
 \description{
 Time series are assumed to be structured as a data frame with one column
 being time stamps and the remaining columns being features that are observed.
-In general, features are orbserved irregularly and asynchronously.  The
+In general, features are observed irregularly and asynchronously.  The
 purpose of this function is derive a regular sequenced, synchronised time
 series.
 }
 \details{
-The function is desinged to be used with the \link[dplyr]{dplyr} family.
+The function is designed to be used with the \link[dplyr]{dplyr} family.
 }
 \examples{
  x <- tibble::tribble(
